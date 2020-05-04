@@ -7,7 +7,12 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     public GameObject playerBody;
+    public GameObject playerOrigin;
+
     public Camera viewport;
+    public GameObject viewportOrigin;
+    public Animator viewportAnimator;
+
     public CharacterController characterController;
 
     public float mouseSensitivity = 15f;
@@ -22,14 +27,15 @@ public class PlayerController : MonoBehaviour
     public float crouchMax = 2f;
     public float crouchSpeed = 10f;
 
+    public float constantGroundedForce = 1f;
     public float gravity = 5f;
     public float maxGravity = 25f;
 
     public PlayerBindings controls = new PlayerBindings();
 
-    private PlayerMovement playerMovement;
-    private PlayerStance playerStance;
-    private PlayerCamera playerCamera;
+    public PlayerMovement playerMovement;
+    public PlayerStance playerStance;
+    public PlayerCamera playerCamera;
 
     void Start()
     {
@@ -44,5 +50,6 @@ public class PlayerController : MonoBehaviour
         playerMovement.DoPlayerMovement();
         playerStance.DoPlayerStance();
         playerCamera.DoPlayerCameraMovement();
+        playerCamera.DoPlayerCameraWalkAnimation();
     }
 }

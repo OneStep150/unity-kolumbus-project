@@ -12,14 +12,18 @@ namespace Assets.Scripts.Player
         private PlayerController playerController;
         private Dictionary<PlayerBindings.KeyBind, KeyCode> keybinds;
 
-        private float crouchAmount = 0f;
         private float originalHeight;
+        private Vector3 originalCenter;
+        
+        private float crouchAmount = 0f;
 
         public PlayerStance(PlayerController playerController)
         {
             this.playerController = playerController;
             keybinds = playerController.controls.keybinds;
+
             originalHeight = playerController.characterController.height;
+            originalCenter = playerController.characterController.center;
         }
 
         public void DoPlayerStance()
@@ -34,7 +38,7 @@ namespace Assets.Scripts.Player
             {
                 RaycastHit hit;
                 
-                if (!Physics.Raycast(playerController.playerBody.transform.position, playerController.playerBody.transform.up, out hit, originalHeight - playerController.characterController.height))
+                if (!Physics.Raycast(playerController.playerBody.transform.position, playerController.playerBody.transform.up, out hit, originalHeight + crouchAmount))
                 {
                     crouchAmount -= playerController.crouchSpeed * Time.deltaTime;
                 }
@@ -43,10 +47,8 @@ namespace Assets.Scripts.Player
 
             crouchAmount = Mathf.Clamp(crouchAmount, 0, 1);
 
-            playerController.characterController.height = Mathf.Lerp(originalHeight, originalHeight - playerController.crouchMax, 
-                crouchAmount);
-
+            playerController.characterController.height = originalHeight - (crouchAmount / 2);
+            playerController.characterController.center = originalCenter + new Vector3(0, (crouchAmount / 2), 0);
         }
-
     }
 }

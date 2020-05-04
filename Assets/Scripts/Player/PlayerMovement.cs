@@ -7,14 +7,15 @@ using UnityEngine;
 
 namespace Assets.Scripts.Player
 {
-    class PlayerMovement
+    public class PlayerMovement
     {
         private PlayerController playerController;
         private Dictionary<PlayerBindings.KeyBind, KeyCode> keybinds;
 
         private float currentGravity = 0f;
 
-        private bool hasJumped = false;
+        public bool hasJumped = false;
+        public bool isMoving = false;
 
         public PlayerMovement(PlayerController playerController)
         {
@@ -33,12 +34,15 @@ namespace Assets.Scripts.Player
         }
         private void DoPlayerMovementLateral(ref Vector3 moveVector)
         {
+            isMoving = false;
+
             KeyCode forwardKey;
             keybinds.TryGetValue(PlayerBindings.KeyBind.PLAYER_MOVE_FORWARD, out forwardKey);
 
             if (Input.GetKey(forwardKey))
             {
-                moveVector += playerController.playerBody.transform.forward * playerController.moveSpeed;
+                moveVector += playerController.playerOrigin.transform.forward * playerController.moveSpeed;
+                isMoving = true;
             }
 
             KeyCode backwardKey;
@@ -46,7 +50,8 @@ namespace Assets.Scripts.Player
 
             if (Input.GetKey(backwardKey))
             {
-                moveVector += -playerController.playerBody.transform.forward * playerController.moveSpeed;
+                moveVector += -playerController.playerOrigin.transform.forward * playerController.moveSpeed;
+                isMoving = true;
             }
 
             KeyCode rightKey;
@@ -54,7 +59,8 @@ namespace Assets.Scripts.Player
 
             if (Input.GetKey(rightKey))
             {
-                moveVector += playerController.playerBody.transform.right * playerController.moveSpeed;
+                moveVector += playerController.playerOrigin.transform.right * playerController.moveSpeed;
+                isMoving = true;
             }
 
             KeyCode leftKey;
@@ -62,7 +68,8 @@ namespace Assets.Scripts.Player
 
             if (Input.GetKey(leftKey))
             {
-                moveVector += -playerController.playerBody.transform.right * playerController.moveSpeed;
+                moveVector += -playerController.playerOrigin.transform.right * playerController.moveSpeed;
+                isMoving = true;
             }
 
             KeyCode sprintKey;
@@ -81,7 +88,7 @@ namespace Assets.Scripts.Player
 
             if (playerController.characterController.isGrounded)
             {
-                currentGravity = 0f;
+                currentGravity = -playerController.constantGroundedForce;
             }
 
             KeyCode jumpKey;
@@ -98,13 +105,12 @@ namespace Assets.Scripts.Player
                 hasJumped = false;
             }
 
-
             if (currentGravity > playerController.maxGravity)
             {
                 currentGravity = playerController.maxGravity;
             }
 
-            moveVector += playerController.playerBody.transform.up * currentGravity * Time.deltaTime;
+            moveVector += playerController.playerOrigin.transform.up * currentGravity * Time.deltaTime;
         }
     }
 }

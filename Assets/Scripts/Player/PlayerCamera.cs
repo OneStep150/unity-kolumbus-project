@@ -9,7 +9,10 @@ namespace Assets.Scripts.Player
 {
     public class PlayerCamera
     {
-        PlayerController playerController;
+        private PlayerController playerController;
+
+        private bool mirrorAnimation = false;
+        private bool mirrorSet = false;
 
         public PlayerCamera(PlayerController playerController)
         {
@@ -19,21 +22,44 @@ namespace Assets.Scripts.Player
 
         public void DoPlayerCameraMovement()
         {
-            Quaternion horizontal = playerController.playerBody.transform.rotation;
+            Quaternion horizontal = playerController.playerOrigin.transform.rotation;
 
             DoPlayerCameraMovementVertical();
             DoPlayerCameraMovementHorizontal();
         }
 
+        public void DoPlayerCameraWalkAnimation()
+        {
+            Vector3 playerVelocity = playerController.characterController.velocity;
+            float swaySpeedMultiplier = Math.Abs(playerVelocity.x) + Math.Abs(playerVelocity.z);
+            swaySpeedMultiplier *= 0.25f;
+
+            playerController.viewportAnimator.SetBool("isWalking", playerController.playerMovement.isMoving && 
+                playerController.characterController.isGrounded);
+            playerController.viewportAnimator.SetFloat("lateralSpeed", swaySpeedMultiplier);
+
+            if (playerController.playerMovement.isMoving && !mirrorSet)
+            {
+                playerController.viewportAnimator.SetBool("mirrorAnimation", mirrorAnimation);
+                mirrorSet = true;
+            }
+
+            if (!playerController.playerMovement.isMoving && mirrorSet)
+            {
+                mirrorAnimation = !mirrorAnimation;
+                mirrorSet = false;
+            }
+        }
+
         private void DoPlayerCameraMovementVertical()
         {
-            float currentY = UnityEditor.TransformUtils.GetInspectorRotation(playerController.viewport.transform).x;
+            float currentY = UnityEditor.TransformUtils.GetInspectorRotation(playerController.viewportOrigin.transform).x;
             float mouseY = playerController.mouseSensitivity * playerController.mouseVerticalMultiplier * Input.GetAxis("Mouse Y");
 
             float newY = currentY - mouseY;
             newY = Mathf.Clamp(newY, -playerController.maxViewAngle, playerController.maxViewAngle);
 
-            playerController.viewport.transform.localRotation = Quaternion.Euler(newY, 0, 0);
+            playerController.viewportOrigin.transform.localRotation = Quaternion.Euler(newY, 0, 0);
         }
 
         private void DoPlayerCameraMovementHorizontal()
