@@ -36,46 +36,32 @@ namespace Assets.Scripts.Player
         {
             isMoving = false;
 
-            KeyCode forwardKey;
-            keybinds.TryGetValue(PlayerBindings.KeyBind.PLAYER_MOVE_FORWARD, out forwardKey);
-
-            if (Input.GetKey(forwardKey))
+            if (Input.GetKey(keybinds[PlayerBindings.KeyBind.PLAYER_MOVE_FORWARD]))
             {
                 moveVector += playerController.playerOrigin.transform.forward * playerController.moveSpeed;
                 isMoving = true;
             }
 
-            KeyCode backwardKey;
-            keybinds.TryGetValue(PlayerBindings.KeyBind.PLAYER_MOVE_BACKWARD, out backwardKey);
-
-            if (Input.GetKey(backwardKey))
+            if (Input.GetKey(keybinds[PlayerBindings.KeyBind.PLAYER_MOVE_BACKWARD]))
             {
                 moveVector += -playerController.playerOrigin.transform.forward * playerController.moveSpeed;
                 isMoving = true;
             }
 
-            KeyCode rightKey;
-            keybinds.TryGetValue(PlayerBindings.KeyBind.PLAYER_MOVE_RIGHT, out rightKey);
-
-            if (Input.GetKey(rightKey))
+            if (Input.GetKey(keybinds[PlayerBindings.KeyBind.PLAYER_MOVE_RIGHT]))
             {
                 moveVector += playerController.playerOrigin.transform.right * playerController.moveSpeed;
                 isMoving = true;
             }
 
-            KeyCode leftKey;
-            keybinds.TryGetValue(PlayerBindings.KeyBind.PLAYER_MOVE_LEFT, out leftKey);
-
-            if (Input.GetKey(leftKey))
+            if (Input.GetKey(keybinds[PlayerBindings.KeyBind.PLAYER_MOVE_LEFT]))
             {
                 moveVector += -playerController.playerOrigin.transform.right * playerController.moveSpeed;
                 isMoving = true;
             }
+            
 
-            KeyCode sprintKey;
-            keybinds.TryGetValue(PlayerBindings.KeyBind.PLAYER_MOVE_SPRINT, out sprintKey);
-
-            if (Input.GetKey(sprintKey))
+            if (Input.GetKey(keybinds[PlayerBindings.KeyBind.PLAYER_MOVE_SPRINT]))
             {
                 moveVector *= playerController.sprintMultiplier;
             }
@@ -84,15 +70,16 @@ namespace Assets.Scripts.Player
         }
         private void DoPlayerMovementVertical(ref Vector3 moveVector)
         {
-            currentGravity += -playerController.gravity * Time.deltaTime;
-
             if (playerController.characterController.isGrounded)
             {
-                currentGravity = -playerController.constantGroundedForce;
+                currentGravity = playerController.gravity;
+            }
+            else
+            {
+                currentGravity += playerController.gravity * Time.deltaTime;
             }
 
-            KeyCode jumpKey;
-            keybinds.TryGetValue(PlayerBindings.KeyBind.PLAYER_MOVE_JUMP, out jumpKey);
+            KeyCode jumpKey = keybinds[PlayerBindings.KeyBind.PLAYER_MOVE_JUMP];
 
             if (Input.GetKey(jumpKey) && playerController.characterController.isGrounded && !hasJumped)
             {
@@ -103,11 +90,6 @@ namespace Assets.Scripts.Player
             if (!Input.GetKey(jumpKey) && playerController.characterController.isGrounded)
             {
                 hasJumped = false;
-            }
-
-            if (currentGravity > playerController.maxGravity)
-            {
-                currentGravity = playerController.maxGravity;
             }
 
             moveVector += playerController.playerOrigin.transform.up * currentGravity * Time.deltaTime;

@@ -31,11 +31,13 @@ namespace Assets.Scripts.Player
         public void DoPlayerCameraWalkAnimation()
         {
             Vector3 playerVelocity = playerController.characterController.velocity;
+
             float swaySpeedMultiplier = Math.Abs(playerVelocity.x) + Math.Abs(playerVelocity.z);
             swaySpeedMultiplier *= 0.25f;
 
             playerController.viewportAnimator.SetBool("isWalking", playerController.playerMovement.isMoving && 
                 playerController.characterController.isGrounded);
+
             playerController.viewportAnimator.SetFloat("lateralSpeed", swaySpeedMultiplier);
 
             if (playerController.playerMovement.isMoving && !mirrorSet)

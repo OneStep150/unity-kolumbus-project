@@ -28,27 +28,29 @@ namespace Assets.Scripts.Player
 
         public void DoPlayerStance()
         {
-            KeyCode crouchKey;
-            keybinds.TryGetValue(PlayerBindings.KeyBind.PLAYER_MOVE_CROUCH, out crouchKey);
 
-            if (Input.GetKey(crouchKey))
+            if (Input.GetKey(keybinds[PlayerBindings.KeyBind.PLAYER_MOVE_CROUCH]))
             {
                 crouchAmount += playerController.crouchSpeed * Time.deltaTime;
-            } else if (crouchAmount > 0)
+            } else if (crouchAmount > 0 && !HittingCeiling())
             {
-                RaycastHit hit;
-                
-                if (!Physics.Raycast(playerController.playerBody.transform.position, playerController.playerBody.transform.up, out hit, originalHeight + crouchAmount))
-                {
-                    crouchAmount -= playerController.crouchSpeed * Time.deltaTime;
-                }
-                
+                crouchAmount -= playerController.crouchSpeed * Time.deltaTime;
             }
 
             crouchAmount = Mathf.Clamp(crouchAmount, 0, 1);
 
             playerController.characterController.height = originalHeight - (crouchAmount / 2);
             playerController.characterController.center = originalCenter + new Vector3(0, (crouchAmount / 2), 0);
+        }
+
+        private bool HittingCeiling()
+        {
+            RaycastHit hit;
+
+            bool hittingCeiling = Physics.Raycast(playerController.playerBody.transform.position,
+                playerController.playerBody.transform.up, out hit, originalHeight + crouchAmount);
+
+            return hittingCeiling;
         }
     }
 }

@@ -27,9 +27,7 @@ public class PlayerController : MonoBehaviour
     public float crouchMax = 2f;
     public float crouchSpeed = 10f;
 
-    public float constantGroundedForce = 1f;
     public float gravity = 5f;
-    public float maxGravity = 25f;
 
     public PlayerBindings controls = new PlayerBindings();
 
